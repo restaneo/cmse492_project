@@ -1,11 +1,18 @@
 # cmse492_project
 Project Overview
+
 This project predicts combined fuel economy (MPG) for US vehicles using machine learning techniques applied to EPA (Environmental Protection Agency) vehicle data. The goal is to develop accurate predictive models that can estimate vehicle fuel efficiency based on various vehicle characteristics such as engine specifications, drivetrain type, and manufacturer details.
+
 Author: James Restaneo
+
 Course: CMSE 492 - Capstone Project
+
 Institution: Michigan State University
+
 Date: October 30, 2025
+
 GitHub Repository: https://github.com/restaneo/cmse492_project
+
 Problem Statement
 Vehicle fuel economy is a critical factor for consumers, policymakers, and environmental planners. Accurate prediction of fuel economy can help:
 
