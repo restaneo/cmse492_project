@@ -5,11 +5,9 @@ This project predicts combined fuel economy (MPG) for US vehicles using machine 
 
 Author: James Restaneo
 
-Course: CMSE 492 - Capstone Project
+Course: CMSE 492 
 
 Institution: Michigan State University
-
-Date: October 30, 2025
 
 GitHub Repository: https://github.com/restaneo/cmse492_project
 
@@ -159,6 +157,7 @@ Contributing
 This is an academic project for CMSE 492. However, suggestions and feedback are welcome via issues or pull requests.
 License
 This project is part of academic coursework at Michigan State University. 
+
 Acknowledgments
 
 Data Source: US Environmental Protection Agency (EPA) - FuelEconomy.gov
