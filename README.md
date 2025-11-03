@@ -1,169 +1,146 @@
 # cmse492_project
-Project Overview
+# Vehicle Fuel Economy Prediction Using Machine Learning
 
-This project predicts combined fuel economy (MPG) for US vehicles using machine learning techniques applied to EPA (Environmental Protection Agency) vehicle data. The goal is to develop accurate predictive models that can estimate vehicle fuel efficiency based on various vehicle characteristics such as engine specifications, drivetrain type, and manufacturer details.
+**Author:** James Restaneo  
+**Email:** restaneo@msu.edu  
+**Course:** CMSE 492 - Computational Data Science Capstone  
+**Semester:** Fall 2025  
+**Institution:** Michigan State University
 
-Author: James Restaneo
+## Project Overview
 
-Course: CMSE 492 
+This project develops and compares three machine learning models (Ridge Regression, Random Forest, XGBoost) to predict combined fuel economy (MPG) for vehicles using EPA's 2020-2024 dataset. The goal is to improve upon a baseline linear regression model (R²=0.027) by implementing advanced techniques including feature engineering, hyperparameter optimization, and model interpretability through SHAP analysis.
 
-Institution: Michigan State University
+## Repository Contents
 
-GitHub Repository: https://github.com/restaneo/cmse492_project
+### Proposal Documents
+- `Restaneo_James_CMSE492_ProjectProposal.pdf` - Complete project proposal (6 pages)
+- `Restaneo_James_CMSE492_ProjectProposal.tex` - LaTeX source code for proposal
 
-Problem Statement
-Vehicle fuel economy is a critical factor for consumers, policymakers, and environmental planners. Accurate prediction of fuel economy can help:
+### Visualization Figures
+- `01_target_distribution.png` - Combined MPG distribution histogram
+- `02_engine_characteristics.png` - Engine displacement and cylinder analysis
+- `03_make_and_fuel_type.png` - Top manufacturers and fuel type distribution
+- `04_correlation_heatmap.png` - Feature correlation matrix
+- `05_baseline_model_performance.png` - Baseline model results
+- `gantt_chart.png` - Project timeline (November 4 - December 8, 2025)
 
-Consumers make informed purchasing decisions
-Manufacturers optimize vehicle design for efficiency
-Policymakers develop effective environmental regulations
-Environmental planners estimate transportation emissions
+### Code
+- `generate_proposal_figures.py` - Python script to generate all data visualizations
+- `preliminary_analysis.ipynb` - Jupyter notebook with exploratory data analysis (if available)
 
-This project uses machine learning to predict combined MPG (city + highway) based on vehicle characteristics, providing insights into which features most significantly impact fuel efficiency.
-Dataset
-Source
-The dataset is based on vehicle testing data from the US Environmental Protection Agency (EPA). The EPA conducts comprehensive fuel economy testing at the National Vehicle and Fuel Emissions Laboratory in Ann Arbor, Michigan, under controlled conditions to provide standardized fuel economy estimates.
-Dataset Characteristics
+### Data
+- `vehicles_2024.csv` - EPA fuel economy dataset (2,500 vehicles, 2020-2024 model years)
 
-Size: 2,500 vehicle records
-Time Period: Model years 2020-2024
-Features: 12 variables including:
+## Dataset Information
 
-Categorical: Make, Model, Transmission Type, Drive Type, Fuel Type
-Numerical: Year, Engine Displacement (L), Number of Cylinders, City MPG, Highway MPG, Combined MPG, CO2 Emissions
+**Source:** EPA Fuel Economy Data (https://www.fueleconomy.gov)  
+**Size:** 2,500 vehicle records  
+**Years:** 2020-2024  
+**Features:** 83 total (categorical and numerical)  
+**Target Variable:** Combined MPG (city/highway)  
+**Range:** 12-136 MPG
 
+### Key Features
+- **Categorical:** Make, model, transmission type, drive configuration, fuel type, vehicle class
+- **Numerical:** Engine displacement (L), cylinders, city MPG, highway MPG, annual fuel cost, CO₂ emissions (g/mi)
 
-Target Variable: Combined MPG (comb_mpg)
-Data Quality: No missing values
+## Preliminary Analysis Results
 
-Key Statistics
+### Baseline Model Performance
+Simple linear regression using only 3 features (year, displacement, cylinders):
+- **Test R²:** 0.027 (2.7% variance explained)
+- **Test RMSE:** 23.51 MPG
+- **Test MAE:** ~18-20 MPG
 
-Average Combined MPG: 25.4 MPG
-Range: 12.2 - 112.7 MPG
-Engine Displacement Range: 1.0 - 6.0 L
-Cylinder Range: 3 - 12 cylinders
+This poor performance demonstrates significant room for improvement and justifies the need for:
+1. Advanced feature engineering (one-hot encoding, polynomial features)
+2. Non-linear models (Random Forest, XGBoost)
+3. Regularization techniques (Ridge regression)
+4. Hyperparameter optimization
 
+### Key Findings
+- Strong negative correlation between engine displacement and fuel economy (r = -0.82)
+- Strong negative correlation between cylinder count and fuel economy (r = -0.76)
+- Very strong negative correlation between CO₂ emissions and fuel economy (r = -0.98)
+- Electric and hybrid vehicles show dramatically higher efficiency (80-100+ MPG)
 
-Prerequisites
+## Proposed Methodology
 
-Python 3.8 or higher
-pip package manager
+### Models
+1. **Ridge Regression** - Linear model with L2 regularization (interpretable baseline)
+2. **Random Forest** - Ensemble of decision trees (captures non-linear relationships)
+3. **XGBoost** - Gradient boosting (state-of-the-art performance)
 
-Installation
+### Evaluation
+- **Primary Metric:** RMSE (Root Mean Squared Error)
+- **Secondary Metrics:** R² (coefficient of determination), MAE (Mean Absolute Error)
+- **Validation:** 5-fold cross-validation, stratified by vehicle class
+- **Interpretability:** SHAP (SHapley Additive exPlanations) values
 
-Clone the repository:
+### Success Criteria
+- Test RMSE < 12 MPG (49% improvement over baseline)
+- Test R² > 0.75 (explains at least 75% of variance)
+- Complete pipeline executes in < 2 hours on standard hardware
 
-bash   git clone https://github.com/restaneo/cmse492_project.git
-   cd cmse492_project
+## Project Timeline
 
-Install required packages:
+- **Week 1 (Nov 4-10):** Data preprocessing and feature engineering
+- **Week 2 (Nov 11-17):** Ridge Regression implementation
+- **Week 3 (Nov 18-24):** Random Forest development
+- **Week 4 (Nov 25-Dec 1):** XGBoost implementation
+- **Week 5 (Dec 2-8):** Presentation, SHAP analysis, and final report
 
-bash   pip install -r requirements.txt
+## How to Generate Figures
 
-Verify installation:
+```bash
+# Ensure you have vehicles_2024.csv in the same directory
+python generate_proposal_figures.py
+```
 
-bash   python -c "import pandas, numpy, sklearn, matplotlib, seaborn; print('All packages installed successfully!')"
-Dependencies
-The project requires the following Python packages:
+This will create all 5 data visualization figures (01-05) used in the proposal.
 
-pandas (>=2.0.0) - Data manipulation and analysis
-numpy (>=1.24.0) - Numerical computing
-scikit-learn (>=1.3.0) - Machine learning algorithms
-matplotlib (>=3.7.0) - Data visualization
-seaborn (>=0.12.0) - Statistical data visualization
-jupyter (>=1.0.0) - Interactive notebooks
+### Requirements
+```bash
+pip install -r requirements.txt
+```
 
-Project Workflow
-1. Data Acquisition and Preprocessing
+**Dependencies:**
+- Python 3.8+
+- pandas >= 1.3.0
+- numpy >= 1.21.0
+- matplotlib >= 3.4.0
+- seaborn >= 0.11.0
+- scikit-learn >= 0.24.0
 
-Load EPA vehicle data from CSV files
-Perform data quality checks (missing values, outliers, data types)
-Split data into training, validation, and test sets (70/15/15)
-Feature engineering: encode categorical variables, create interaction features
-Feature scaling: standardization for numerical features
+## Expected Contributions
 
-2. Exploratory Data Analysis
+1. **Open-Source Tools:** Reproducible Python codebase addressing the lack of publicly available fuel economy prediction models
+2. **Empirical Evidence:** Quantitative comparison of Ridge, Random Forest, and XGBoost on real-world data
+3. **Interpretable Insights:** SHAP analysis revealing which specifications most influence fuel economy
+4. **Methodological Template:** End-to-end ML workflow documentation for future capstone projects
 
-Distribution analysis of target variable (combined MPG)
-Correlation analysis between features
-Visualization of relationships between engine characteristics and fuel economy
-Analysis of fuel economy by vehicle make and fuel type
-Identification of outliers and anomalies
+## Acknowledgments
 
-3. Model Development
-The project implements three models of increasing complexity:
-Baseline Model (Simple):
+This project proposal was developed with assistance from Claude (Anthropic), an AI assistant used for literature research, data exploration planning, and document preparation.
 
-Linear Regression with basic features
-Serves as performance benchmark
-Current Test R²: 0.027 (needs improvement with feature engineering)
+## References
 
-Intermediate Model (Planned):
+1. US EPA. "Fuel Economy Data." https://www.fueleconomy.gov/feg/download.shtml (2024)
+2. Chen, T., Guestrin, C. "XGBoost: A Scalable Tree Boosting System." Proc. 22nd ACM SIGKDD (2016)
+3. Breiman, L. "Random Forests." Machine Learning 45(1), 5-32 (2001)
+4. Lundberg, S.M., Lee, S.-I. "A Unified Approach to Interpreting Model Predictions." Advances in NIPS (2017)
 
-Random Forest Regressor
-Ensemble method with decision trees
-Handles non-linear relationships and feature interactions
+## License
 
-Advanced Model (Planned):
+This project is for academic purposes as part of CMSE 492 at Michigan State University.
 
-Gradient Boosting (XGBoost/LightGBM)
-Deep Neural Network
-Hyperparameter tuning via grid search/random search
+## Contact
 
-4. Model Evaluation
-
-Primary Metric: Root Mean Squared Error (RMSE)
-Secondary Metrics: Mean Absolute Error (MAE), R² Score
-Validation: 5-fold cross-validation
-Comparison: Performance comparison across all models
-Interpretation: Feature importance analysis using SHAP values
-
-Current Progress
-
-HW08
-
-Dataset loaded and explored (2,500 vehicles)
-Created 5 comprehensive visualizations
-Baseline Linear Regression model trained
-Baseline performance: Test R² = 0.027, RMSE = 23.51 MPG
-
-
-Next Steps:
-
-Feature engineering and advanced preprocessing
-Implementation of intermediate and advanced models
-Hyperparameter tuning and model optimization
-Comprehensive model comparison and interpretation
-
-
-
-Key Findings (Preliminary)
-
-Strong negative correlation between engine displacement and fuel economy (r = -0.43)
-Electric and hybrid vehicles show significantly higher fuel economy (80-100+ MPG equivalent)
-Number of cylinders inversely correlates with fuel economy
-Wide variation in fuel economy across manufacturers (top performers: Tesla, Toyota, Honda)
-Baseline model demonstrates room for improvement through feature engineering and advanced algorithms
-
-Future Enhancements
-
-Incorporate additional features (vehicle weight, aerodynamics)
-Time series analysis of fuel economy trends over years
-Multi-output prediction (simultaneous prediction of city and highway MPG)
-Model deployment as a web application for real-time predictions
-Integration with real-world vehicle databases
-
-Contributing
-This is an academic project for CMSE 492. However, suggestions and feedback are welcome via issues or pull requests.
-License
-This project is part of academic coursework at Michigan State University. 
-
-Acknowledgments
-
-Data Source: US Environmental Protection Agency (EPA) - FuelEconomy.gov
-Course: CMSE 492 
-Institution: Michigan State University, Department of Computational Mathematics, Science and Engineering
-Instructor: Luciano Silvestri
+**James Restaneo**  
+restaneo@msu.edu  
+Michigan State University  
+Department of Computational Mathematics, Science and Engineering
 
 Contact
 For questions or collaboration inquiries, please contact:
