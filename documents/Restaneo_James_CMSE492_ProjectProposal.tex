@@ -1,0 +1,194 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{times}
+
+\title{Vehicle Fuel Economy Prediction Using Machine Learning}
+
+\author{James Restaneo\\
+\texttt{restaneo@msu.edu}\\
+Department of Computational Mathematics, Science and Engineering\\
+Michigan State University\\
+GitHub: \url{https://github.com/restaneo/cmse492_project}}
+
+\date{November 2, 2025}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Vehicle fuel economy prediction addresses critical environmental policy and consumer decision-making needs. This project compares three machine learning models (Ridge Regression, Random Forest, XGBoost) for predicting combined MPG using EPA's 2020-2024 vehicle dataset (2,500 samples, 83 features). Preliminary analysis shows baseline linear regression achieves R²=0.027, RMSE=23.51 MPG, indicating substantial improvement opportunity. Ridge provides an interpretable baseline, Random Forest captures non-linear interactions, and XGBoost implements gradient boosting for optimal performance. Models will be evaluated using 5-fold cross-validation with RMSE, R², and MAE metrics. SHAP analysis provides interpretability. The seven-week timeline (Nov 4–Dec 8) includes data preparation, iterative model development, and error analysis. Expected outcomes: RMSE<12 MPG (R²>0.75), open-source code, and actionable insights for stakeholders.
+\end{abstract}
+
+\section{Introduction and Background}
+
+Vehicle fuel economy directly impacts consumer costs, greenhouse gas emissions, and regulatory compliance. The transportation sector accounts for 28\% of US emissions, with light-duty vehicles contributing 58\%. Corporate Average Fuel Economy (CAFE) standards mandate fleet-wide targets, making accurate prediction models essential for design optimization and policy planning.
+
+Current methods range from physics-based simulations requiring extensive computational resources to empirical models using proprietary data. This project leverages EPA's publicly available dataset to develop transparent, reproducible models. The dataset contains specifications for 2,500 vehicles (2020-2024), including engine displacement, transmission type, and drive configuration.
+
+By comparing three approaches (Ridge Regression, Random Forest, XGBoost), this work quantifies the bias-variance tradeoff and identifies optimal algorithms for deployment.
+
+\textbf{Research Question:} Can machine learning predict combined fuel economy from vehicle specifications with RMSE<12 MPG and R²>0.75, and which algorithm balances accuracy with interpretability?
+
+\section{Data Description}
+
+\textbf{Source:} EPA Fuel Economy Data (\url{https://www.fueleconomy.gov}), US Government Open Data.
+
+\textbf{Dataset:} \texttt{vehicles\_2024.csv} contains 2,500 records (2020-2024) with 83 features:
+\begin{itemize}
+\item \textit{Target:} Combined MPG (continuous, 12-136 MPG)
+\item \textit{Categorical:} Make, model, transmission, drive, fuel type, vehicle class
+\item \textit{Numerical:} Displacement (L), cylinders, city/highway MPG, fuel cost, CO₂ emissions
+\end{itemize}
+
+\textbf{Quality:} Minimal missing values (<2\%), professionally maintained. Extreme values (136 MPG for plug-in hybrids) are legitimate.
+
+\textbf{Exploratory Analysis:} Figure~\ref{fig:target} shows combined MPG distribution (mean=25.3, median=23, std=7.8) with right skew and long tail for hybrids/EVs. Figure~\ref{fig:engine} reveals displacement and cylinder count relationships with fuel economy. Figure~\ref{fig:make} displays top manufacturers and fuel type distribution. Figure~\ref{fig:corr} shows strong correlations: displacement (-0.82), cylinders (-0.76), CO₂ (-0.98) with MPG. Figure~\ref{fig:baseline} presents baseline model performance.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\textwidth]{01_target_distribution.png}
+\caption{Combined MPG distribution showing right-skewed pattern with mode at 20-25 MPG.}
+\label{fig:target}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{02_engine_characteristics.png}
+\caption{Engine characteristics: displacement vs fuel economy (left) and cylinder count analysis (right).}
+\label{fig:engine}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{03_make_and_fuel_type.png}
+\caption{Top manufacturers by vehicle count (left) and fuel type distribution (right).}
+\label{fig:make}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\textwidth]{04_correlation_heatmap.png}
+\caption{Correlation matrix showing strong negative correlations between engine size and fuel economy.}
+\label{fig:corr}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\textwidth]{05_baseline_model_performance.png}
+\caption{Baseline linear regression: actual vs predicted (left) and residual plot (right), R²=0.027, RMSE=23.51 MPG.}
+\label{fig:baseline}
+\end{figure}
+
+\textbf{Baseline:} Simple linear regression (no regularization, no feature engineering) achieves R²=0.027, RMSE=23.51 MPG on test set, confirming need for advanced methods.
+
+\section{Methodology}
+
+\subsection{Data Preprocessing}
+
+\textbf{Feature Engineering:} (1) One-hot encoding for categorical variables; (2) Polynomial features (degree=2) for interactions; (3) StandardScaler normalization; (4) 80/20 train-test split, stratified by vehicle class.
+
+\subsection{Models}
+
+\textbf{1. Ridge Regression (Linear + L2)}
+\[J(\mathbf{w}) = \frac{1}{2n}\sum_{i=1}^{n}(y_i - \mathbf{w}^T\mathbf{x}_i)^2 + \alpha||\mathbf{w}||_2^2\]
+
+\textit{Complexity:} Linear, $O(p^2)$ features with polynomials. Hyperparameter $\alpha$ via GridSearchCV.
+
+\textit{Rationale:} Interpretable baseline with explicit coefficients.
+
+\textbf{2. Random Forest (Ensemble Trees)}
+\[\hat{y} = \frac{1}{B}\sum_{b=1}^{B}T_b(\mathbf{x})\]
+
+\textit{Complexity:} Non-linear, captures interactions. Parameters: n\_estimators (50-200), max\_depth (10-30), min\_samples\_split (2-10).
+
+\textit{Rationale:} Handles non-linearities, provides feature importances.
+
+\textbf{3. XGBoost (Gradient Boosting)}
+\[\mathcal{L} = \sum_{i=1}^{n}l(y_i, \hat{y}_i) + \sum_{k=1}^{K}\Omega(f_k)\]
+
+\textit{Complexity:} Sequential trees. Parameters: learning\_rate (0.01-0.3), max\_depth (3-10), n\_estimators (100-500).
+
+\textit{Rationale:} State-of-the-art performance, early stopping.
+
+\begin{table}[htbp]
+\centering
+\caption{Model complexity and expected performance}
+\begin{tabular}{lccc}
+\toprule
+Model & Parameters & Non-linearity & Expected RMSE \\
+\midrule
+Ridge & $\sim$200 & No & 16-18 MPG \\
+Random Forest & $\sim$10K & Yes & 10-14 MPG \\
+XGBoost & $\sim$50K & Yes & 8-12 MPG \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Evaluation}
+
+\textbf{Metrics:} RMSE (primary), R² (variance explained), MAE (robust to outliers).
+
+\textbf{Validation:} 5-fold cross-validation, stratified by vehicle class.
+
+\textbf{Interpretability:} SHAP values quantify feature contributions.
+
+\section{Timeline and Milestones}
+
+Figure~\ref{fig:gantt} shows the seven-week timeline (Nov 4–Dec 8).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{gantt_chart.png}
+\caption{Project Gantt chart showing weekly tasks, milestones, and Thanksgiving buffer.}
+\label{fig:gantt}
+\end{figure}
+
+\textbf{Week 1 (Nov 4-10):} Data preprocessing: one-hot encoding, polynomial features, train-test split. \textit{Milestone:} Clean dataset, validated pipeline.
+
+\textbf{Week 2 (Nov 11-17):} Ridge Regression with GridSearchCV, learning curves. \textit{Milestone:} RMSE<18 MPG, R²>0.50.
+
+\textbf{Week 3 (Nov 18-24):} Random Forest with 5-fold CV, feature importance. \textit{Milestone:} RMSE<12 MPG, R²>0.75. Thanksgiving buffer (Nov 27-29).
+
+\textbf{Week 4 (Nov 25-Dec 1):} XGBoost with Bayesian optimization, early stopping. \textit{Milestone:} RMSE<10 MPG, R²>0.85.
+
+\textbf{Week 5 (Dec 2-8):} Presentation (Dec 2-4), SHAP analysis, final report (Dec 8).
+
+\textbf{Risk Mitigation:} If computation excessive, use Random Forest as primary. If performance inadequate, try two-stage powertrain-specific modeling. Total buffer: 4 days. Allocation: 15-20 hours/week.
+
+\section{Expected Contributions}
+
+\textbf{(1) Open-Source Tools:} Reproducible Python code (scikit-learn, XGBoost, SHAP) addressing lack of public fuel economy models. All code/data on GitHub with documentation.
+
+\textbf{(2) Empirical Evidence:} Quantitative comparison on real data, providing model selection guidance. Learning curves illustrate bias-variance tradeoffs.
+
+\textbf{(3) Interpretable Insights:} SHAP analysis reveals which specifications influence fuel economy, informing design priorities and consumer decisions. May guide CAFE compliance.
+
+\textbf{(4) Methodological Template:} End-to-end ML workflow documentation for capstone projects.
+
+\section{Conclusion}
+
+This proposal outlines rigorous methodology for predicting vehicle fuel economy using EPA's 2020-2024 dataset. Preliminary analysis identifies significant improvement opportunity (baseline R²=0.027). The proposed models (Ridge, Random Forest, XGBoost) suit complex interactions between specifications.
+
+The seven-week timeline balances development, evaluation, and interpretation with adequate buffers. Expected outcomes: RMSE<12 MPG (R²>0.75), open-source code, and SHAP-based insights for engineers, policymakers, and consumers.
+
+\section*{Acknowledgments}
+
+This project proposal was developed with assistance from Claude (Anthropic), an AI assistant used for literature research, data exploration planning, and document preparation.
+
+\begin{thebibliography}{99}
+\bibitem{epa} US EPA, ``Fuel Economy Data,'' \url{https://www.fueleconomy.gov/feg/download.shtml} (2024).
+\bibitem{ghg} US EPA, ``Greenhouse Gas Emissions,'' \url{https://www.epa.gov/ghgemissions} (2025).
+\bibitem{cafe} NHTSA, ``Corporate Average Fuel Economy,'' \url{https://www.nhtsa.gov/laws-regulations/corporate-average-fuel-economy} (2024).
+\bibitem{xgb} T. Chen, C. Guestrin, ``XGBoost: Scalable Tree Boosting,'' \textit{Proc. 22nd ACM SIGKDD} (2016).
+\bibitem{rf} L. Breiman, ``Random Forests,'' \textit{Machine Learning} \textbf{45}(1), 5-32 (2001).
+\bibitem{ridge} A. E. Hoerl, R. W. Kennard, ``Ridge Regression,'' \textit{Technometrics} \textbf{12}(1), 55-67 (1970).
+\bibitem{shap} S. M. Lundberg, S.-I. Lee, ``SHAP,'' \textit{Advances in NIPS} (2017).
+\bibitem{sklearn} F. Pedregosa et al., ``Scikit-learn,'' \textit{JMLR} \textbf{12}, 2825-2830 (2011).
+\end{thebibliography}
+
+\end{document}
