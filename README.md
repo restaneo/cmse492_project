@@ -3,7 +3,7 @@
 
 **Author:** James Restaneo  
 **Email:** restaneo@msu.edu  
-**Course:** CMSE 492 - Computational Data Science Capstone  
+**Course:** CMSE 492 - Computational Data Science
 **Semester:** Fall 2025  
 **Institution:** Michigan State University
 
@@ -118,7 +118,7 @@ pip install -r requirements.txt
 1. **Open-Source Tools:** Reproducible Python codebase addressing the lack of publicly available fuel economy prediction models
 2. **Empirical Evidence:** Quantitative comparison of Ridge, Random Forest, and XGBoost on real-world data
 3. **Interpretable Insights:** SHAP analysis revealing which specifications most influence fuel economy
-4. **Methodological Template:** End-to-end ML workflow documentation for future capstone projects
+4. **Methodological Template:** End-to-end ML workflow documentation for future projects
 
 ## Acknowledgments
 
